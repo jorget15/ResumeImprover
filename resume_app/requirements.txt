@@ -1,4 +1,6 @@
 streamlit
+pdfplumber
+python-docx
 docx2txt
 PyPDF2
 requests
