@@ -4,6 +4,14 @@ from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 import nltk
 import os
+import nltk.data
+
+# Force NLTK to use the correct path on both local and Streamlit Cloud
+nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
+if not os.path.exists(nltk_data_path):
+    os.makedirs(nltk_data_path)
+
+nltk.data.path.append(nltk_data_path)  # Ensure correct path
 
 # List of required NLTK resources
 nltk_resources = [
@@ -12,19 +20,18 @@ nltk_resources = [
     "omw-1.4"
 ]
 
-
 # Function to check and download missing NLTK resources
 def ensure_nltk_resources():
     for resource in nltk_resources:
         try:
             nltk.data.find(f"taggers/{resource}")  # Check if resource exists
         except LookupError:
-            nltk.download(resource)  # Download only if missing
-
+            nltk.download(resource, download_dir=nltk_data_path)  # Download only if missing
 
 # Ensure resources are available at runtime
 ensure_nltk_resources()
 
+print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
 
 def load_excluded_words():
     """Loads excluded words (common verbs, prepositions, etc.) from the correct file location."""
