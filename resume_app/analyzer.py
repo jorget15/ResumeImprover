@@ -1,17 +1,25 @@
 import json
-from collections import Counter
 import re
-from nltk import bigrams, WordNetLemmatizer, pos_tag
+from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 import nltk
+import os
 
 # Ensure required NLTK resources are downloaded at runtime
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
 
-def load_excluded_words(filepath="excluded_words.json"):
+
+def load_excluded_words(filepath=None):
     """Loads excluded words (common verbs, prepositions, etc.) from a JSON file."""
+    if filepath is None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))  # Get current script directory
+        filepath = os.path.join(script_dir, "excluded_words.json")  # Absolute path
+
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"❌ Error: Excluded words file not found at {filepath}")
+
     with open(filepath, "r", encoding="utf-8") as file:
         data = json.load(file)
     return set(data["excluded_words"])
