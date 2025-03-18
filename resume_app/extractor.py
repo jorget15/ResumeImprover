@@ -52,9 +52,9 @@ def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5):
 
     return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
 
-def extract_bigrams(text, excluded_words_path="excluded_words.json", top_n=5):
+def extract_bigrams(text, top_n=5):
     """Extracts properly formatted bigrams, excluding single occurrences."""
-    excluded_words = load_excluded_words(excluded_words_path)
+    excluded_words = load_excluded_words()
     words = re.findall(r"\b\w+\b", text.lower())
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
