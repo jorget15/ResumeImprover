@@ -5,11 +5,6 @@ from nltk.corpus import wordnet
 import nltk
 import os
 
-# Ensure required NLTK resources are downloaded at runtime
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-
 # List of required NLTK resources
 nltk_resources = [
     "averaged_perceptron_tagger",
@@ -17,9 +12,8 @@ nltk_resources = [
     "omw-1.4"
 ]
 
+
 # Function to check and download missing NLTK resources
-
-
 def ensure_nltk_resources():
     for resource in nltk_resources:
         try:
