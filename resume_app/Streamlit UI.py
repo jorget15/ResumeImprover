@@ -1,5 +1,6 @@
 import streamlit as st
 from matcher import analyze_resume_against_job
+from extractor import extract_company_name
 
 st.title("📄 Resume vs Job Posting Analyzer")
 
@@ -9,6 +10,10 @@ job_text = st.text_area("Paste Job Posting Text", height=200)
 
 # Hidden job posting section
 show_text = st.checkbox("Show Job Posting Text", value=False)
+
+# Extract company name from job posting
+company_name = extract_company_name(job_text)
+st.subheader(f"🏢 Job Posting from: **{company_name}**")
 
 if show_text:
     st.subheader("🔎 Extracted Job Posting Text")
