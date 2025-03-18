@@ -10,6 +10,27 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
 
+# List of required NLTK resources
+nltk_resources = [
+    "averaged_perceptron_tagger",
+    "wordnet",
+    "omw-1.4"
+]
+
+# Function to check and download missing NLTK resources
+
+
+def ensure_nltk_resources():
+    for resource in nltk_resources:
+        try:
+            nltk.data.find(f"taggers/{resource}")  # Check if resource exists
+        except LookupError:
+            nltk.download(resource)  # Download only if missing
+
+
+# Ensure resources are available at runtime
+ensure_nltk_resources()
+
 
 def load_excluded_words():
     """Loads excluded words (common verbs, prepositions, etc.) from the correct file location."""
@@ -23,6 +44,7 @@ def load_excluded_words():
         data = json.load(file)
 
     return set(data["excluded_words"])
+
 
 lemmatizer = WordNetLemmatizer()
 
