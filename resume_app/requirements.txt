@@ -7,3 +7,4 @@ requests
 beautifulsoup4
 nltk
 openai
+--extra-index-url https://pypi.org/simple
