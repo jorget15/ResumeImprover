@@ -1,3 +1,4 @@
+import pdfplumber
 import docx2txt
 import PyPDF2
 from collections import Counter
@@ -6,26 +7,28 @@ from nltk import bigrams
 from analyzer import load_excluded_words, lemmatize_word, calculate_importance
 
 
-def extract_text_from_docx(file_path):
-    """Extract text from a DOCX file."""
-    return docx2txt.process(file_path)
+def extract_resume_text(uploaded_file):
+    """Extracts text from a PDF or DOCX resume."""
+    if uploaded_file is None:
+        return ""
 
+    file_type = uploaded_file.type
 
-def extract_text_from_pdf(file_path):
-    """Extract text from a PDF file."""
-    PDFtext = ""
-    with open(file_path, "rb") as file:
-        reader = PyPDF2.PdfReader(file)
-        for page in reader.pages:
-            PDFtext += page.extract_text() + "\n"
-    return PDFtext
+    if file_type == "application/pdf":
+        with pdfplumber.open(uploaded_file) as pdf:
+            return "\n".join([page.extract_text() or "" for page in pdf.pages])
+
+    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return docx2txt.process(uploaded_file)
+
+    return ""
 
 def extract_text(file_path):
     """Extract text from a DOCX or PDF file."""
     if file_path.lower().endswith(".docx"):
-        return extract_text_from_docx(file_path)
+        return extract_resume_text(file_path)
     elif file_path.lower().endswith(".pdf"):
-        return extract_text_from_pdf(file_path)
+        return extract_resume_text(file_path)
     else:
         raise ValueError("Unsupported file format. Please use DOCX or PDF.")
 

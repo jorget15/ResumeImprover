@@ -1,8 +1,19 @@
 import streamlit as st
 from matcher import analyze_resume_against_job
-from extractor import extract_company_name
+from extractor import extract_company_name, extract_resume_text
 
 st.title("📄 Resume vs Job Posting Analyzer")
+
+# --- Resume Upload ---
+uploaded_resume = st.file_uploader("📂 Upload Your Resume (PDF/DOCX)", type=["pdf", "docx"])
+
+# --- Option to Paste Resume Instead (Hidden Initially) ---
+show_paste_option = st.checkbox("Paste Resume Instead")
+
+if show_paste_option:
+    resume_text = st.text_area("✍ Paste your Resume Text", height=200)
+else:
+    resume_text = extract_resume_text(uploaded_resume)
 
 # User Inputs
 resume_text = st.text_area("Paste your Resume Text", height=200)
