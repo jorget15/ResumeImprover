@@ -43,7 +43,7 @@ def extract_text_from_url(url):
 
 def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5):
     """Finds the most frequent words (ignoring single occurrences), assigns importance scores, and returns occurrence count."""
-    excluded_words = load_excluded_words(excluded_words_path)  # Load excluded words
+    excluded_words = load_excluded_words()  # Load excluded words
     words = re.findall(r"\b\w+\b", text.lower())  # Tokenize words
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
