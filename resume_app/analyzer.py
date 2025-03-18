@@ -18,6 +18,7 @@ nltk_resources = [
     "averaged_perceptron_tagger",
     "wordnet",
     "omw-1.4"
+    "taggers/averaged_perceptron_tagger_eng"  # Explicitly include this missing one
 ]
 
 
@@ -25,10 +26,9 @@ nltk_resources = [
 def ensure_nltk_resources():
     for resource in nltk_resources:
         try:
-            nltk.data.find(f"taggers/{resource}")  # Check if resource exists
+            nltk.data.find(resource)  # Check if resource exists
         except LookupError:
-            nltk.download(resource, download_dir=nltk_data_path)  # Download only if missing
-
+            nltk.download(resource.split('/')[-1], download_dir=nltk_data_path)  # Download only if missing
 
 # Ensure resources are available at runtime
 ensure_nltk_resources()
