@@ -20,6 +20,7 @@ nltk_resources = [
     "omw-1.4"
 ]
 
+
 # Function to check and download missing NLTK resources
 def ensure_nltk_resources():
     for resource in nltk_resources:
@@ -28,10 +29,12 @@ def ensure_nltk_resources():
         except LookupError:
             nltk.download(resource, download_dir=nltk_data_path)  # Download only if missing
 
+
 # Ensure resources are available at runtime
 ensure_nltk_resources()
 
 print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
+
 
 def load_excluded_words():
     """Loads excluded words (common verbs, prepositions, etc.) from the correct file location."""
