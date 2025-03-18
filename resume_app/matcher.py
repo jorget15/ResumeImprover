@@ -18,6 +18,7 @@ def count_matches(text, keywords):
 
 def analyze_resume_against_job(resume_text, job_text):
     """Finds keyword & bigram matches between the resume and job description."""
+
     excluded_words = load_excluded_words()
 
     # Extract job posting keywords and bigrams
@@ -28,31 +29,26 @@ def analyze_resume_against_job(resume_text, job_text):
     resume_keywords = extract_keywords(resume_text)
     resume_bigrams = extract_bigrams(resume_text)
 
-    # Convert keyword tuples to lists
-    job_keyword_list = [word for word, _, _ in job_keywords]
-    job_bigram_list = [bigram for bigram, _, _ in job_bigrams]
+    # Convert to sets for easy matching
+    job_keyword_set = {word for word, _, _ in job_keywords}
+    job_bigram_set = {bigram for bigram, _, _ in job_bigrams}
+    resume_keyword_set = {word for word, _, _ in resume_keywords}
+    resume_bigram_set = {bigram for bigram, _, _ in resume_bigrams}
 
-    resume_keyword_list = [word for word, _, _ in resume_keywords]
-    resume_bigram_list = [bigram for bigram, _, _ in resume_bigrams]
+    # Find matches
+    keyword_matches = [(word, count) for word, count, _ in job_keywords if word in resume_keyword_set]
+    bigram_matches = [(bigram, count) for bigram, count, _ in job_bigrams if bigram in resume_bigram_set]
 
-    # Debugging: Print extracted bigrams before matching
-    print("\n🔍 Debugging Extracted Job Posting Bigrams:")
-    print(job_bigram_list)
-
-    print("\n🔍 Debugging Extracted Resume Bigrams:")
-    print(resume_bigram_list)
-
-    # Count occurrences of job keywords in the resume
-    keyword_matches = count_matches(resume_text, job_keyword_list)
-    bigram_matches = count_matches(resume_text, job_bigram_list)
-
-    # Identify missing but important job posting keywords
-    missing_keywords = [word for word in job_keyword_list if keyword_matches[word] == 0]
-    missing_bigrams = [bigram for bigram in job_bigram_list if bigram_matches[bigram] == 0]
+    # Find missing important keywords & bigrams
+    missing_keywords = [word for word in job_keyword_set if word not in resume_keyword_set]
+    missing_bigrams = [bigram for bigram in job_bigram_set if bigram not in resume_bigram_set]
 
     return {
+        "top_job_keywords": job_keywords,  # List of all job posting keywords
+        "top_job_bigrams": job_bigrams,    # List of all job posting bigrams
         "keyword_matches": keyword_matches,
         "bigram_matches": bigram_matches,
         "missing_keywords": missing_keywords,
         "missing_bigrams": missing_bigrams
     }
+

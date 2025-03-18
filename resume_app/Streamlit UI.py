@@ -1,62 +1,62 @@
 import streamlit as st
-from extractor import extract_keywords, extract_bigrams
 from matcher import analyze_resume_against_job
-import pdfplumber
-from docx import Document
 
+st.title("📄 Resume vs Job Posting Analyzer")
 
-def extract_text_from_pdf(uploaded_file):
-    """Extracts text from an uploaded PDF file."""
-    text = ""
-    with pdfplumber.open(uploaded_file) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() + "\n"
-    return text
+# User Inputs
+resume_text = st.text_area("Paste your Resume Text", height=200)
+job_text = st.text_area("Paste Job Posting Text", height=200)
 
+# Hidden job posting section
+show_text = st.checkbox("Show Job Posting Text", value=False)
 
-def extract_text_from_docx(uploaded_file):
-    """Extracts text from an uploaded DOCX file."""
-    doc = Document(uploaded_file)
-    return "\n".join([para.text for para in doc.paragraphs])
-
-
-# Streamlit UI setup
-st.title("📄 Resume Improver")
-st.write("Upload your resume and paste a job description to analyze how well they match!")
-
-# Upload Resume
-uploaded_resume = st.file_uploader("Upload Resume (PDF or DOCX)", type=["pdf", "docx"])
-resume_text = ""
-if uploaded_resume:
-    if uploaded_resume.type == "application/pdf":
-        resume_text = extract_text_from_pdf(uploaded_resume)
-    elif uploaded_resume.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        resume_text = extract_text_from_docx(uploaded_resume)
-    st.text_area("Extracted Resume Text:", resume_text, height=200)
-
-# Input Job Description
-job_text = st.text_area("Paste Job Description Here:", height=200)
+if show_text:
+    st.subheader("🔎 Extracted Job Posting Text")
+    st.write(job_text)
 
 if st.button("Analyze Resume"):
     if resume_text and job_text:
-        # Run the matching analysis
+        # Run analysis
         match_results = analyze_resume_against_job(resume_text, job_text)
 
-        # Display Results
+        # Display results
         st.subheader("🔍 Resume Matching Results")
 
-        st.write("### ✅ Keyword Matches")
-        for word, count in match_results["keyword_matches"].items():
-            st.write(f"- {word}: {count} occurrences")
+        # Top Job Keywords
+        st.write("### 🔹 **Top Keywords in Job Posting**")
+        for word, count, score in match_results["top_job_keywords"]:
+            st.write(f"**{word}**: {count} occurrences, Importance: {score}/10")
 
-        st.write("### 🔗 Bigram Matches")
-        for bigram, count in match_results["bigram_matches"].items():
-            st.write(f"- {bigram}: {count} occurrences")
+        # Top Job Bigrams
+        st.write("### 🔹 **Top Bigrams in Job Posting**")
+        for bigram, count, score in match_results["top_job_bigrams"]:
+            st.write(f"**{bigram}**: {count} occurrences, Importance: {score}/10")
 
-        st.write("### ❌ Missing Keywords")
-        st.write(", ".join(match_results["missing_keywords"]))
+        # Keyword Matches
+        st.write("### ✅ **Keyword Matches in Resume**")
+        if match_results["keyword_matches"]:
+            for word, count in match_results["keyword_matches"]:
+                st.write(f"✔ **{word}**: {count} occurrences")
+        else:
+            st.write("⚠ No keyword matches found.")
 
-        st.write("### ❌ Missing Bigrams")
-        st.write(", ".join(match_results["missing_bigrams"]))
+        # Bigram Matches
+        st.write("### 🔗 **Bigram Matches in Resume**")
+        if match_results["bigram_matches"]:
+            for bigram, count in match_results["bigram_matches"]:
+                st.write(f"✔ **{bigram}**: {count} occurrences")
+        else:
+            st.write("⚠ No bigram matches found.")
+
+        # Missing Important Keywords
+        if match_results["missing_keywords"]:
+            st.write("### ❌ **Missing Important Keywords**")
+            st.write(", ".join(match_results["missing_keywords"]))
+
+        # Missing Important Bigrams
+        if match_results["missing_bigrams"]:
+            st.write("### ❌ **Missing Important Bigrams**")
+            st.write(", ".join(match_results["missing_bigrams"]))
+
     else:
-        st.warning("Please upload a resume and paste a job description before analyzing.")
+        st.warning("⚠ Please paste both your resume and the job posting text.")
