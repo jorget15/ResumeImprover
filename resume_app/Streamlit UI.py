@@ -14,8 +14,9 @@ if uploaded_resume:
 # --- Job Posting Input ---
 job_text = st.text_area("📋 Paste Job Posting Text", height=200)
 
-# --- Extract and Show Company Name (Only After Analysis) ---
-company_name = extract_company_name(job_text)
+# --- Initialize Company Name (Hidden Initially) ---
+company_name = extract_company_name(job_text) if job_text else ""
+show_company_input = False  # Hide company input until analysis
 
 # --- Analyze Button ---
 if st.button("🔍 Analyze Resume"):
@@ -27,12 +28,14 @@ if st.button("🔍 Analyze Resume"):
         # Run analysis
         match_results = analyze_resume_against_job(resume_text, job_text)
 
-        # Show Company Name (Only if Found)
-        if company_name:
-            st.subheader(f"🏢 Job Posting from: **{company_name}**")
+        # Show Company Name Input Field After Analysis
+        show_company_input = True  # Now allow user input
 
         # --- Display Results ---
         st.subheader("🔍 Resume Matching Results")
+
+        # Company Name Input Field (Editable)
+        company_name = st.text_input("🏢 Company Name:", value=company_name, placeholder="Enter company name")
 
         # Top Job Keywords
         st.write("### 🔹 **Top Keywords in Job Posting**")
