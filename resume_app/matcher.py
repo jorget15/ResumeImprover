@@ -24,12 +24,12 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
     excluded_words = load_excluded_words(company_name)  # Exclude only the company name
 
     # Extract job keywords & bigrams
-    job_keywords = extract_keywords(job_text, excluded_words, company_name)
-    job_bigrams = extract_bigrams(job_text, excluded_words, company_name)
+    job_keywords = extract_keywords(job_text, company_name)
+    job_bigrams = extract_bigrams(job_text, company_name)
 
     # Extract resume keywords & bigrams
-    resume_keywords = extract_keywords(resume_text, excluded_words, company_name)
-    resume_bigrams = extract_bigrams(resume_text, excluded_words, company_name)
+    resume_keywords = extract_keywords(resume_text, company_name)
+    resume_bigrams = extract_bigrams(resume_text, company_name)
 
     # Identify matches & missing elements
     keyword_matches = [(word, resume_keywords[word]) for word in job_keywords if word in resume_keywords]
