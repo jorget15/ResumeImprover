@@ -1,34 +1,24 @@
 import streamlit as st
 from matcher import analyze_resume_against_job
-from extractor import extract_company_name, extract_resume_text
+from extractor import extract_resume_text
 
 st.title("📄 Resume vs Job Posting Analyzer")
 
+# --- User Enters Company Name ---
+company_name = st.text_input("🏢 Enter the Company Name")
+
 # --- Resume Upload ---
 uploaded_resume = st.file_uploader("📂 Upload Your Resume (PDF/DOCX)", type=["pdf", "docx"])
-
-# Extract resume text (automatically from the file)
 resume_text = extract_resume_text(uploaded_resume) if uploaded_resume else ""
 
-# Job Posting Input
+# --- Job Posting Input ---
 job_text = st.text_area("📋 Paste Job Posting Text", height=200)
-
-# --- Extract Company Name ---
-company_name = extract_company_name(job_text)
-
-# If no company is found, allow the user to enter it manually
-if company_name == "Unknown Company":
-    company_name = st.text_input("🏢 Company Name (Enter if not detected)", "")
-    company_confirmed = bool(company_name.strip())  # Check if user entered something
-else:
-    st.subheader(f"🏢 Job Posting from: **{company_name}**")
-    company_confirmed = True  # Company is valid
 
 # --- Analyze Resume Button ---
 if st.button("Analyze Resume"):
-    if resume_text and job_text and company_confirmed:
+    if resume_text and job_text and company_name.strip():
         # Run analysis
-        match_results = analyze_resume_against_job(resume_text, job_text)
+        match_results = analyze_resume_against_job(resume_text, job_text, company_name)
 
         # Display results
         st.subheader("🔍 Resume Matching Results")
@@ -70,5 +60,4 @@ if st.button("Analyze Resume"):
             st.write(", ".join(match_results["missing_bigrams"]))
 
     else:
-        st.warning("⚠ Please upload a resume and paste the job posting text.")
-
+        st.warning("⚠ Please upload a resume, paste the job posting text, and enter the company name.")
