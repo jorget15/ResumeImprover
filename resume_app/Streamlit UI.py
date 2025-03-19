@@ -11,8 +11,8 @@ resume_text = ""
 if uploaded_resume:
     resume_text = extract_resume_text(uploaded_resume)
 
-# --- Job Posting Input ---
-job_text = st.text_area("📋 Paste Job Posting Text", height=200)
+# --- Job Posting Input (Fix for Broken Textbox) ---
+job_text = st.text_area("📋 Paste Job Posting Text Here", value="", height=200)
 
 # --- Initialize Company Name (Hidden Initially) ---
 company_name = extract_company_name(job_text) if job_text else ""
