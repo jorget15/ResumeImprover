@@ -3,6 +3,7 @@ from analyzer import load_excluded_words  # Load excluded words from analyzer
 import re
 from collections import defaultdict
 
+
 def count_matches(text, keywords):
     """Counts occurrences of job-related keywords and bigrams in a resume."""
     word_counts = defaultdict(int)
@@ -23,12 +24,12 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
     excluded_words = load_excluded_words(company_name)  # Exclude only the company name
 
     # Extract job keywords & bigrams
-    job_keywords = extract_keywords(job_text, excluded_words)
-    job_bigrams = extract_bigrams(job_text, excluded_words)
+    job_keywords = extract_keywords(job_text, excluded_words, company_name)
+    job_bigrams = extract_bigrams(job_text, excluded_words, company_name)
 
     # Extract resume keywords & bigrams
-    resume_keywords = extract_keywords(resume_text, excluded_words)
-    resume_bigrams = extract_bigrams(resume_text, excluded_words)
+    resume_keywords = extract_keywords(resume_text, excluded_words, company_name)
+    resume_bigrams = extract_bigrams(resume_text, excluded_words, company_name)
 
     # Identify matches & missing elements
     keyword_matches = [(word, resume_keywords[word]) for word in job_keywords if word in resume_keywords]
@@ -45,4 +46,3 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
         "missing_keywords": missing_keywords,
         "missing_bigrams": missing_bigrams,
     }
-

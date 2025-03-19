@@ -1,6 +1,5 @@
 import pdfplumber
 import docx2txt
-import PyPDF2
 from collections import Counter
 import re
 from nltk import bigrams
@@ -23,6 +22,7 @@ def extract_resume_text(uploaded_file):
 
     return ""
 
+
 def extract_text(file_path):
     """Extract text from a DOCX or PDF file."""
     if file_path.lower().endswith(".docx"):
@@ -31,6 +31,7 @@ def extract_text(file_path):
         return extract_resume_text(file_path)
     else:
         raise ValueError("Unsupported file format. Please use DOCX or PDF.")
+
 
 def extract_text_from_paste(pasted_text):
     """Returns the pasted job description text."""
@@ -42,11 +43,13 @@ def extract_text_from_paste(pasted_text):
 
 def extract_text_from_url(url):
     """Placeholder function for future API integration. Displays WIP message."""
-    return "[WIP] Automatic job posting extraction from URLs is under development. Please paste the job description manually."
+    return ("[WIP] Automatic job posting extraction from URLs is under development. "
+            "Please paste the job description manually.")
 
-def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5):
+
+def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5, company_name=None):
     """Finds the most frequent words (ignoring single occurrences), assigns importance scores, and returns occurrence count."""
-    excluded_words = load_excluded_words()  # Load excluded words
+    excluded_words = load_excluded_words(company_name)  # Load excluded words
     words = re.findall(r"\b\w+\b", text.lower())  # Tokenize words
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
@@ -55,9 +58,10 @@ def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5):
 
     return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
 
-def extract_bigrams(text, top_n=5):
+
+def extract_bigrams(text, top_n=5, company_name=None):
     """Extracts properly formatted bigrams, excluding single occurrences."""
-    excluded_words = load_excluded_words()
+    excluded_words = load_excluded_words(company_name)
     words = re.findall(r"\b\w+\b", text.lower())
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
@@ -69,6 +73,7 @@ def extract_bigrams(text, top_n=5):
     # Properly join bigrams for output
     return [(" ".join(pair), count, importance_scores[pair])
             for pair, count in bigram_counts.most_common(top_n) if count > 1]
+
 
 def extract_company_name(text):
     """Extracts the company name from job postings using patterns."""
