@@ -39,8 +39,10 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
     missing_bigrams = [bigram for bigram in job_bigrams if bigram not in resume_bigrams]
 
     return {
-        "top_job_keywords": job_keywords,  # Remove .items()
-        "top_job_bigrams": job_bigrams,  # Remove .items()
+        "top_job_keywords": job_keywords,
+        "top_job_bigrams": job_bigrams,
         "keyword_matches": keyword_matches,
         "bigram_matches": bigram_matches,
+        "missing_keywords": missing_keywords,  # ✅ Add this line
+        "missing_bigrams": missing_bigrams,  # ✅ Add this line
     }
