@@ -35,14 +35,15 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
     keyword_matches = [(word, resume_keywords[word]) for word in job_keywords if word in resume_keywords]
     bigram_matches = [(bigram, resume_bigrams[bigram]) for bigram in job_bigrams if bigram in resume_bigrams]
 
-    missing_keywords = [keyword for keyword in job_keywords if keyword not in resume_keywords]
-    missing_bigrams = [bigram for bigram in job_bigrams if bigram not in resume_bigrams]
+    missing_keywords = [keyword[0] for keyword in job_keywords if keyword[0] not in resume_keywords]
+    missing_bigrams = [bigram[0] for bigram in job_bigrams if bigram[0] not in resume_bigrams]
 
     return {
         "top_job_keywords": job_keywords,
         "top_job_bigrams": job_bigrams,
         "keyword_matches": keyword_matches,
         "bigram_matches": bigram_matches,
-        "missing_keywords": missing_keywords,  # ✅ Add this line
-        "missing_bigrams": missing_bigrams,  # ✅ Add this line
+        "missing_keywords": [keyword[0] for keyword in job_keywords if keyword[0] not in resume_keywords],  # ✅ FIXED
+        "missing_bigrams": [bigram[0] for bigram in job_bigrams if bigram[0] not in resume_bigrams],  # ✅ FIXED
+
     }
