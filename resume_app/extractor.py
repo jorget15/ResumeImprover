@@ -1,8 +1,8 @@
+import nltk
 import pdfplumber
 import docx2txt
 from collections import Counter
 import re
-from nltk import bigrams
 from analyzer import load_excluded_words, lemmatize_word, calculate_importance
 
 
@@ -47,33 +47,31 @@ def extract_text_from_url(url):
             "Please paste the job description manually.")
 
 
-def extract_keywords(text, top_n=5, company_name=None):
-    """Finds the most frequent words, assigns importance scores, and returns word counts with scores."""
-    excluded_words = load_excluded_words(company_name)  # Load excluded words
-    words = re.findall(r"\b\w+\b", text.lower())  # Tokenize words
+def extract_keywords(text, company_name=None, top_n=5):
+    """Finds the most frequent words while removing excluded words."""
+    excluded_words = load_excluded_words(company_name)  # ✅ Load properly filtered excluded words
+    words = re.findall(r"\b\w+\b", text.lower())  # ✅ Ensure words are in lowercase
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
     word_counts = Counter(filtered_words)
     importance_scores = calculate_importance(word_counts)
 
-    # Return sorted list of (word, count, importance) and ensure at least top_n words if available
-    return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n)]
+    return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
 
 
-def extract_bigrams(text, top_n=5, company_name=None):
-    """Extracts properly formatted bigrams, excluding single occurrences."""
-    excluded_words = load_excluded_words(company_name)
-    words = re.findall(r"\b\w+\b", text.lower())
+def extract_bigrams(text, company_name=None, top_n=5):
+    """Finds the most frequent bigrams while removing excluded words."""
+    excluded_words = load_excluded_words(company_name)  # ✅ Load excluded words
+    words = re.findall(r"\b\w+\b", text.lower())  # ✅ Convert words to lowercase
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
-    # Ensure bigrams() receives a list of words, not a single string
-    bigram_pairs = list(bigrams(filtered_words))
-    bigram_counts = Counter(bigram_pairs)
+    bigrams = list(nltk.bigrams(filtered_words))  # ✅ Generate bigrams from filtered words
+    bigram_counts = Counter([" ".join(bigram) for bigram in bigrams])  # ✅ Join words into bigrams
+
     importance_scores = calculate_importance(bigram_counts)
 
-    # Properly join bigrams for output
-    return [(" ".join(pair), count, importance_scores[pair])
-            for pair, count in bigram_counts.most_common(top_n) if count > 1]
+    return [(bigram, count, importance_scores[bigram]) for bigram, count in bigram_counts.most_common(top_n) if
+            count > 1]
 
 
 def extract_company_name(text):
