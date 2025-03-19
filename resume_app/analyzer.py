@@ -36,7 +36,7 @@ ensure_nltk_resources()
 print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
 
 
-def load_excluded_words(company_name):
+def load_excluded_words(company_name=None):
     """Loads excluded words while keeping company tools and technologies."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     excluded_filepath = os.path.join(script_dir, "excluded_words.json")
@@ -48,24 +48,25 @@ def load_excluded_words(company_name):
     if os.path.exists(excluded_filepath):
         with open(excluded_filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
-            excluded_words.update(data["excluded_words"])
+            excluded_words.update(data.get("excluded_words", []))  # Ensure it doesn't fail if key is missing
 
-    # If company_name is not provided, skip tool lookup
-    if not company_name:
+    # If company_name is not provided, return common excluded words only
+    if not company_name or not company_name.strip():
         return excluded_words
 
-    # Exclude the company name but keep related tools
-    company_name = company_name.lower().strip()
+    company_name = company_name.lower().strip()  # Normalize company name
+
+    # Load company-specific tools and exclude the company name
     if os.path.exists(tools_filepath):
         with open(tools_filepath, "r", encoding="utf-8") as file:
             for line in file:
                 name, *tools = line.strip().split(": ")
                 if name.lower() == company_name:
-                    # Keep tools but exclude company name
-                    excluded_words.add(company_name)
-                    break
+                    excluded_words.add(company_name)  # Exclude company name but keep tools
+                    break  # Stop searching once found
 
     return excluded_words
+
 
 
 lemmatizer = WordNetLemmatizer()

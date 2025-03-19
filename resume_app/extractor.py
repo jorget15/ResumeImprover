@@ -47,8 +47,8 @@ def extract_text_from_url(url):
             "Please paste the job description manually.")
 
 
-def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5, company_name=None):
-    """Finds the most frequent words (ignoring single occurrences), assigns importance scores, and returns occurrence count."""
+def extract_keywords(text, top_n=5, company_name=None):
+    """Finds the most frequent words, assigns importance scores, and returns word counts with scores."""
     excluded_words = load_excluded_words(company_name)  # Load excluded words
     words = re.findall(r"\b\w+\b", text.lower())  # Tokenize words
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
@@ -56,7 +56,8 @@ def extract_keywords(text, excluded_words_path="excluded_words.json", top_n=5, c
     word_counts = Counter(filtered_words)
     importance_scores = calculate_importance(word_counts)
 
-    return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
+    # Return sorted list of (word, count, importance) and ensure at least top_n words if available
+    return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n)]
 
 
 def extract_bigrams(text, top_n=5, company_name=None):
