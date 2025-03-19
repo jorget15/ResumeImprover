@@ -28,8 +28,8 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
     job_bigrams = extract_bigrams(job_text, top_n=5, company_name=company_name)
 
     # Extract resume keywords & bigrams
-    resume_keywords = extract_keywords(resume_text, company_name)
-    resume_bigrams = extract_bigrams(resume_text, company_name)
+    resume_keywords = extract_keywords(resume_text, top_n=5, company_name=None)
+    resume_bigrams = extract_bigrams(resume_text, top_n=5, company_name=None)
 
     # Identify matches & missing elements
     keyword_matches = [(word, resume_keywords[word]) for word in job_keywords if word in resume_keywords]
