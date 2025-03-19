@@ -17,7 +17,7 @@ def count_matches(text, keywords):
     return word_counts
 
 
-def analyze_resume_against_job(resume_text, job_text, company_name):
+def analyze_resume_against_job(resume_text, job_text, company_name=None):
     """Finds keyword & bigram matches between the resume and job posting."""
 
     excluded_words = load_excluded_words(company_name)  # Exclude only the company name

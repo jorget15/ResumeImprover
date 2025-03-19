@@ -50,6 +50,10 @@ def load_excluded_words(company_name):
             data = json.load(file)
             excluded_words.update(data["excluded_words"])
 
+    # If company_name is not provided, skip tool lookup
+    if not company_name:
+        return excluded_words
+
     # Exclude the company name but keep related tools
     company_name = company_name.lower().strip()
     if os.path.exists(tools_filepath):

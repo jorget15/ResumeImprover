@@ -5,7 +5,7 @@ from extractor import extract_resume_text
 st.title("📄 Resume vs Job Posting Analyzer")
 
 # --- User Enters Company Name ---
-company_name = st.text_input("🏢 Enter the Company Name")
+company_name = st.text_input("🏢 Enter the Company Name (Required)")
 
 # --- Resume Upload ---
 uploaded_resume = st.file_uploader("📂 Upload Your Resume (PDF/DOCX)", type=["pdf", "docx"])
@@ -16,7 +16,11 @@ job_text = st.text_area("📋 Paste Job Posting Text", height=200)
 
 # --- Analyze Resume Button ---
 if st.button("Analyze Resume"):
-    if resume_text and job_text and company_name.strip():
+    if not company_name.strip():
+        st.warning("⚠ Please enter the company name before analyzing. This helps us filter out the company name from results.")
+    elif not resume_text or not job_text:
+        st.warning("⚠ Please upload a resume and paste the job posting text.")
+    else:
         # Run analysis
         match_results = analyze_resume_against_job(resume_text, job_text, company_name)
 
@@ -58,6 +62,3 @@ if st.button("Analyze Resume"):
         if match_results["missing_bigrams"]:
             st.write("### ❌ **Missing Important Bigrams**")
             st.write(", ".join(match_results["missing_bigrams"]))
-
-    else:
-        st.warning("⚠ Please upload a resume, paste the job posting text, and enter the company name.")
