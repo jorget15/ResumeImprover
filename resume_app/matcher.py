@@ -24,8 +24,8 @@ def analyze_resume_against_job(resume_text, job_text, company_name=None):
     excluded_words = load_excluded_words(company_name)  # Exclude only the company name
 
     # Extract job keywords & bigrams
-    job_keywords = extract_keywords(job_text, company_name)
-    job_bigrams = extract_bigrams(job_text, company_name)
+    job_keywords = extract_keywords(job_text, top_n=5, company_name=company_name)
+    job_bigrams = extract_bigrams(job_text, top_n=5, company_name=company_name)
 
     # Extract resume keywords & bigrams
     resume_keywords = extract_keywords(resume_text, company_name)
