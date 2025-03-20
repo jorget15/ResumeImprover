@@ -38,6 +38,22 @@ if st.button("Analyze Resume"):
         for bigram, count, score in match_results["top_job_bigrams"]:
             st.write(f"**{bigram}**: {count} occurrences, Importance: {score}/10")
 
+        # Top Resume Keywords
+        st.write("### 📝 **Top Keywords in Resume**")
+        if match_results["top_resume_keywords"]:
+            for word, count, score in match_results["top_resume_keywords"]:
+                st.write(f"**{word}**: {count} occurrences, Importance: {score}/10")
+        else:
+            st.write("⚠ No significant keywords found in resume.")
+
+        # Top Resume Bigrams
+        st.write("### 📝 **Top Bigrams in Resume**")
+        if match_results["top_resume_bigrams"]:
+            for bigram, count, score in match_results["top_resume_bigrams"]:
+                st.write(f"**{bigram}**: {count} occurrences, Importance: {score}/10")
+        else:
+            st.write("⚠ No significant bigrams found in resume.")
+
         # Keyword Matches
         st.write("### ✅ **Keyword Matches in Resume**")
         if match_results["keyword_matches"]:
