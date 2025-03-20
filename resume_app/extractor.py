@@ -73,19 +73,3 @@ def extract_bigrams(text, company_name=None, top_n=5):
 
     return [(bigram, count, importance_scores[bigram]) for bigram, count in bigram_counts.most_common(top_n) if
             count > 1]
-
-
-def extract_company_name(text):
-    """Extracts the company name from job postings using patterns."""
-    patterns = [
-        r"([A-Za-z\s]+) is looking for",  # Example: "Google is looking for..."
-        r"([A-Za-z\s]+) seeks",  # Example: "Amazon seeks a..."
-        r"at ([A-Za-z\s]+)"  # Example: "Software Engineer at Microsoft"
-    ]
-
-    for pattern in patterns:
-        match = re.search(pattern, text)
-        if match:
-            return match.group(1).strip()
-
-    return "Unknown Company"
