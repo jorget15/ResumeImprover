@@ -66,6 +66,7 @@ def extract_bigrams(text, company_name=None, top_n=5):
     filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
 
     bigrams = list(nltk.bigrams(filtered_words))  # ✅ Generate bigrams from filtered words
+    filtered_bigrams = [" ".join(bigram) for bigram in bigrams if not any(word in excluded_words for word in bigram)]
     bigram_counts = Counter([" ".join(bigram) for bigram in bigrams])  # ✅ Join words into bigrams
 
     importance_scores = calculate_importance(bigram_counts)

@@ -49,8 +49,7 @@ def load_excluded_words(company_name):
     if os.path.exists(excluded_filepath):
         with open(excluded_filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
-            excluded_words.update(
-                word.lower() for word in data["excluded_words"])  # Ensure it doesn't fail if key is missing
+            excluded_words.update(word.lower() for word in data.get("excluded_words", []))  # Ensure it doesn't fail if key is missing
 
     # If company_name is not provided, return common excluded words only
     if not company_name or not company_name.strip():
@@ -64,12 +63,9 @@ def load_excluded_words(company_name):
             for line in file:
                 name, *tools = line.strip().split(": ")
                 if name.lower() == company_name:
-                    excluded_words.add(company_name)  # Exclude company name but keep tools
+                    excluded_words.update(tools) # Exclude company name but keep tools
                     break  # Stop searching once found
 
-        # Exclude company name if provided
-    if company_name:
-        excluded_words.add(company_name.lower())
     return excluded_words
 
 
