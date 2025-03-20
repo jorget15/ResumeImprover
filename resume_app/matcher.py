@@ -21,8 +21,6 @@ def count_matches(text, keywords):
 def analyze_resume_against_job(resume_text, job_text, company_name=None):
     """Finds keyword & bigram matches between the resume and job posting."""
 
-    excluded_words = load_excluded_words(company_name)  # Exclude only the company name
-
     # Extract job keywords & bigrams
     job_keywords = extract_keywords(job_text, top_n=5, company_name=company_name)
     job_bigrams = extract_bigrams(job_text, top_n=5, company_name=company_name)
