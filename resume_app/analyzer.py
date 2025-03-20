@@ -63,9 +63,12 @@ def load_excluded_words(company_name):
             for line in file:
                 name, *tools = line.strip().split(": ")
                 if name.lower() == company_name:
-                    excluded_words.update(tools) # Exclude company name but keep tools
+                    excluded_words.add(company_name)  # Exclude company name but keep tools
                     break  # Stop searching once found
 
+        # Exclude company name if provided
+    if company_name:
+        excluded_words.add(company_name.lower())
     return excluded_words
 
 
