@@ -38,28 +38,22 @@ print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
 
 
 def load_excluded_words(company_name=None):
-    """Loads excluded words while keeping company tools and technologies."""
+    """Loads excluded words across all categories while keeping company tools and technologies."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     excluded_filepath = os.path.join(script_dir, "excluded_words.json")
 
     excluded_words = set()
 
-    # Load common excluded words
     if os.path.exists(excluded_filepath):
         with open(excluded_filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
-            excluded_words.update(
-                word.lower() for word in data.get("excluded_words", [])
-            )  # Ensure it doesn't fail if key is missing
+            for category_list in data.values():
+                excluded_words.update(word.lower() for word in category_list)
 
-    # If company_name is missing, return excluded words
-    if not company_name or not company_name.strip():
-        return excluded_words  # ✅ Returns the set, not None
+    if company_name and company_name.strip():
+        excluded_words.add(company_name.lower().strip())
 
-    # Normalize company name and add it to the exclusion list
-    excluded_words.add(company_name.lower().strip())
-
-    return excluded_words  # ✅ Always returns a valid set
+    return excluded_words
 
 
 lemmatizer = WordNetLemmatizer()

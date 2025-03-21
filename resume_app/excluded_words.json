@@ -1,3 +1,10 @@
 {
-  "excluded_words": ["job","from","you'll","you","apply","U.S.","our","is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did", "can", "could", "should", "would", "will", "shall", "may", "might", "must", "and", "or", "but", "so", "because", "the","a", "an", "of", "in", "on", "at", "by", "we", "with","become", "for", "your", "prefer", "to","require", "Usa", "Salary", "will", "submit", "s"]
+  "pronouns": ["you", "your", "we", "our"],
+  "auxiliary_verbs": ["is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did", "can", "could", "should", "would", "will", "shall", "may", "might", "must"],
+  "conjunctions": ["and", "or", "but", "so", "because"],
+  "articles": ["the", "a", "an"],
+  "prepositions": ["of", "in", "on", "at", "by", "with", "for", "from", "to"],
+  "generic_words": ["job", "apply", "submit", "salary", "require", "become", "prefer", "s"],
+  "countries": ["usa", "u.s."],
+  "contractions": ["you'll"]
 }
