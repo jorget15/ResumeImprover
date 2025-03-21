@@ -47,9 +47,17 @@ def load_excluded_words(company_name=None):
     if os.path.exists(excluded_filepath):
         with open(excluded_filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
-            for category_list in data.values():
-                excluded_words.update(word.lower() for word in category_list)
 
+            # Flatten any nested lists in JSON to ensure all words are added
+            for category_list in data.values():
+                if isinstance(category_list, list):  # Make sure it's actually a list
+                    for word in category_list:
+                        if isinstance(word, list):  # If there's another nested list, unpack it
+                            excluded_words.update(w.lower() for w in word)
+                        else:
+                            excluded_words.add(word.lower())
+
+    # Add company name (if provided) to the excluded words list
     if company_name and company_name.strip():
         excluded_words.add(company_name.lower().strip())
 
