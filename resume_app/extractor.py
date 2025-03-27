@@ -4,6 +4,7 @@ import docx2txt
 from collections import Counter
 import re
 from analyzer import load_excluded_words, lemmatize_word, calculate_importance
+import unicodedata
 
 
 def extract_resume_text(uploaded_file):
@@ -41,22 +42,39 @@ def extract_text_from_paste(pasted_text):
         return "No job description provided. Please paste the job description."
 
 
-def extract_text_from_url(url):
-    """Placeholder function for future API integration. Displays WIP message."""
-    return ("[WIP] Automatic job posting extraction from URLs is under development. "
-            "Please paste the job description manually.")
+# def extract_text_from_url(url):
+#    """Placeholder function for future API integration. Displays WIP message."""
+#    return ("[WIP] Automatic job posting extraction from URLs is under development. "
+#            "Please paste the job description manually.")
 
 
-def extract_keywords(text, company_name=None, top_n=5):
-    """Finds the most frequent words while removing excluded words."""
-    excluded_words = load_excluded_words(company_name)  # ✅ Load properly filtered excluded words
-    words = re.findall(r"\b\w+\b", text.lower())  # ✅ Ensure words are in lowercase
-    filtered_words = [lemmatize_word(word) for word in words if word not in excluded_words]
+def extract_keywords(text, top_n=5, company_name=None):
+    """
+    Finds the most frequent words (ignoring single occurrences),
+    assigns importance scores, and returns occurrence count.
+    """
+    # 1) Load excluded words
+    excluded_words = load_excluded_words(company_name)
 
+    # 2) Tokenize text, ensuring lowercase
+    words = re.findall(r"\b\w+\b", text.lower())
+
+    # 3) Normalize each token (strip hidden Unicode, whitespace, etc.)
+    normalized_words = [normalize_token(w) for w in words]
+
+    # 4) Filter out excluded words, then lemmatize
+    filtered_words = [lemmatize_word(w) for w in normalized_words if w not in excluded_words]
+
+    # 5) Build frequency counts & calculate importance
     word_counts = Counter(filtered_words)
     importance_scores = calculate_importance(word_counts)
 
-    return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
+    # 6) Return the top N (if top_n is None, you can return all)
+    #    If you only want tokens with freq > 1, keep your "if count > 1" check
+    if top_n is not None:
+        return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
+    else:
+        return [(word, count, importance_scores[word]) for word, count in word_counts.most_common() if count > 1]
 
 
 def extract_bigrams(text, company_name=None, top_n=5):
@@ -73,3 +91,15 @@ def extract_bigrams(text, company_name=None, top_n=5):
 
     return [(bigram, count, importance_scores[bigram]) for bigram, count in bigram_counts.most_common(top_n) if
             count > 1]
+
+
+def normalize_token(token: str) -> str:
+    """
+    Convert token to a normalized form and strip whitespace
+    or invisible characters, ensuring tokens match excluded words exactly.
+    """
+    # 1) Normalize to handle weird Unicode variations (NFKC handles e.g. half-width characters)
+    token = unicodedata.normalize('NFKC', token)
+    # 2) Strip trailing spaces, zero-width spaces, etc.
+    token = token.strip()
+    return token
