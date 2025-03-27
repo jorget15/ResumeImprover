@@ -4,7 +4,7 @@ from extractor import extract_resume_text
 
 st.title("📄 Resume vs Job Posting Analyzer")
 
-# --- User Enters Company Name ---
+# --- Company Name ---
 company_name = st.text_input("🏢 Enter the Company Name (Required)")
 
 # --- Resume Upload ---
@@ -14,18 +14,17 @@ resume_text = extract_resume_text(uploaded_resume) if uploaded_resume else ""
 # --- Job Posting Input ---
 job_text = st.text_area("📋 Paste Job Posting Text", height=200)
 
-# --- Analyze Resume Button ---
+# --- Analyze Button ---
 if st.button("Analyze Resume"):
     if not company_name.strip():
-        st.warning(
-            "⚠ Please enter the company name before analyzing. This helps us filter out the company name from results.")
-    elif not resume_text or not job_text:
+        st.warning("⚠ Please enter the company name before analyzing. This helps exclude the company name from results.")
+    elif not resume_text or not job_text.strip():
         st.warning("⚠ Please upload a resume and paste the job posting text.")
     else:
-        # Run analysis
+        # 1) Run analysis
         match_results = analyze_resume_against_job(resume_text, job_text, company_name)
 
-        # Display results
+        # 2) Display results
         st.subheader("🔍 Resume Matching Results")
 
         # Top Job Keywords
@@ -57,16 +56,16 @@ if st.button("Analyze Resume"):
         # Keyword Matches
         st.write("### ✅ **Keyword Matches in Resume**")
         if match_results["keyword_matches"]:
-            for word, count in match_results["keyword_matches"]:
-                st.write(f"✔ **{word}**: {count} occurrences")
+            for word, job_count in match_results["keyword_matches"]:
+                st.write(f"✔ **{word}**: {job_count} occurrences (job posting side)")
         else:
             st.write("⚠ No keyword matches found.")
 
         # Bigram Matches
         st.write("### 🔗 **Bigram Matches in Resume**")
         if match_results["bigram_matches"]:
-            for bigram, count in match_results["bigram_matches"]:
-                st.write(f"✔ **{bigram}**: {count} occurrences")
+            for bigram, job_count in match_results["bigram_matches"]:
+                st.write(f"✔ **{bigram}**: {job_count} occurrences (job posting side)")
         else:
             st.write("⚠ No bigram matches found.")
 

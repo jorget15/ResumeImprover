@@ -1,10 +1,12 @@
 import json
+import os
 import re
+import nltk
+import nltk.data
+import unicodedata
+
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
-import nltk
-import os
-import nltk.data
 
 # Force NLTK to use the correct path on both local and Streamlit Cloud
 nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
@@ -18,110 +20,115 @@ nltk_resources = [
     "averaged_perceptron_tagger",
     "wordnet",
     "omw-1.4"
-    "taggers/averaged_perceptron_tagger_eng"  # Explicitly include this missing one
+    # "taggers/averaged_perceptron_tagger_eng"  # Usually "averaged_perceptron_tagger" alone suffices
 ]
 
 
-# Function to check and download missing NLTK resources
 def ensure_nltk_resources():
+    """Ensure all required NLTK models are installed."""
     for resource in nltk_resources:
         try:
-            nltk.data.find(resource)  # Check if resource exists
+            nltk.data.find(resource)
         except LookupError:
-            nltk.download(resource.split('/')[-1], download_dir=nltk_data_path)  # Download only if missing
+            nltk.download(resource.split('/')[-1], download_dir=nltk_data_path)
 
-
-# Ensure resources are available at runtime
+# Initialize NLTK resources at import
 ensure_nltk_resources()
 
 print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
 
-
 def load_excluded_words(company_name=None):
-    """Loads excluded words across all categories while keeping company tools and technologies."""
+    """
+    Loads excluded words from excluded_words.json. Optionally excludes the company name.
+    JSON can have categories or plain lists, but we flatten them into one set.
+    """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    excluded_filepath = os.path.join(script_dir, "excluded_words.json")
+    excluded_path = os.path.join(script_dir, "excluded_words.json")
 
     excluded_words = set()
 
-    if os.path.exists(excluded_filepath):
-        with open(excluded_filepath, "r", encoding="utf-8") as file:
+    # Load all categories from excluded_words.json
+    if os.path.exists(excluded_path):
+        with open(excluded_path, "r", encoding="utf-8") as file:
             data = json.load(file)
-
-            # Flatten any nested lists in JSON to ensure all words are added
-            for category_list in data.values():
-                if isinstance(category_list, list):  # Make sure it's actually a list
-                    for word in category_list:
-                        if isinstance(word, list):  # If there's another nested list, unpack it
-                            excluded_words.update(w.lower() for w in word)
+            for category_values in data.values():
+                if isinstance(category_values, list):
+                    for word in category_values:
+                        if isinstance(word, list):
+                            # Flatten nested lists
+                            excluded_words.update(w.lower().strip() for w in word)
                         else:
-                            excluded_words.add(word.lower())
+                            excluded_words.add(word.lower().strip())
 
-    # Add company name (if provided) to the excluded words list
+    # Exclude company name if provided
     if company_name and company_name.strip():
         excluded_words.add(company_name.lower().strip())
 
     return excluded_words
 
-
 lemmatizer = WordNetLemmatizer()
-
 
 def get_wordnet_pos(word):
     """Map POS tag to first character WordNetLemmatizer understands."""
     tag = pos_tag([word])[0][1][0].upper()
     tag_dict = {"J": wordnet.ADJ, "N": wordnet.NOUN, "V": wordnet.VERB, "R": wordnet.ADV}
-    return tag_dict.get(tag, wordnet.NOUN)  # Default to NOUN if not found
-
+    return tag_dict.get(tag, wordnet.NOUN)  # Default to NOUN
 
 def lemmatize_word(word):
-    """Lemmatizes a word based on its part of speech and handles special cases manually."""
+    """
+    Lemmatizes a single token. Also handles some manual special cases:
+    e.g., 'engineering' -> 'engineer', 'programming' -> 'program'.
+    """
     lemma = lemmatizer.lemmatize(word.lower(), get_wordnet_pos(word))
-
-    # Manually handling common edge cases (e.g., engineering -> engineer)
     special_cases = {
         "engineering": "engineer",
         "programming": "program",
         "developing": "develop",
         "analyzing": "analyze",
     }
-
     return special_cases.get(lemma, lemma)
 
-
 def calculate_importance(counts):
-    """Assigns importance scores from 1 to 10, ensuring consistency across keywords and bigrams."""
+    """
+    Assigns importance scores from 1 to 10. The highest-count word gets 10,
+    scaling down proportionally for others.
+    """
     if not counts:
         return {}
 
     max_count = max(counts.values())
 
-    # Avoid division errors and ensure proper scaling
+    # If everything has count=1, let's give them all midscore=5
     if max_count == 1:
-        return {word: 5 for word in counts.keys()}  # Assign middle score if everything appears only once
+        return {word: 5 for word in counts.keys()}
 
     importance_scores = {
-        word: max(1, round((count / max_count) * 10))  # Ensure scaling works consistently
+        word: max(1, round((count / max_count) * 10))
         for word, count in counts.items()
     }
-
     return importance_scores
 
-
 def emphasize_target_words(text):
-    """Identifies and emphasizes words that come after key hiring phrases."""
-    emphasis_phrases = [
-        "we are looking for", "company is looking for", "we need", "company needs"
-    ]
-    words_to_emphasize = []
-
+    """
+    Example function that identifies words after phrases like 'we are looking for'.
+    Not widely used in your code, but kept if you want to highlight target words.
+    """
+    emphasis_phrases = ["we are looking for", "company is looking for", "we need", "company needs"]
+    results = []
     text_lower = text.lower()
     for phrase in emphasis_phrases:
-        start = text_lower.find(phrase)
-        if start != -1:
-            after_phrase = text_lower[start + len(phrase):].strip()
+        idx = text_lower.find(phrase)
+        if idx != -1:
+            after_phrase = text_lower[idx + len(phrase):].strip()
             match = re.match(r"(\w+)", after_phrase)
             if match:
-                words_to_emphasize.append(lemmatize_word(match.group(1)))
+                results.append(lemmatize_word(match.group(1)))
+    return results
 
-    return words_to_emphasize
+def normalize_token(token: str) -> str:
+    """
+    Convert token to NFKC form and strip whitespace, so 'a\u00a0' -> 'a'.
+    Defined here in case you want to share across code.
+    """
+    token = unicodedata.normalize("NFKC", token)
+    return token.strip()

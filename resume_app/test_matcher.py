@@ -65,5 +65,9 @@ def debug_exclusion(company_name=None):
     for kw, count, score in top_keywords:
         print(f"{kw}: {count} occurrences, importance {score}/10")
 
+        for i, token in enumerate(normalized_words):
+            if token == "a":
+                print(i, repr(token), "excluded?", token in excluded_words)
+
 if __name__ == "__main__":
     debug_exclusion(company_name=None)  # or "FBI" or "A" or whatever to test
