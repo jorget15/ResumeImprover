@@ -28,7 +28,7 @@ def normalize_token(token: str) -> str:
 def debug_exclusion(company_name=None):
     """Debug function to see how excluded words filter out 'a' or any other tokens."""
 
-    # 1️⃣ Load excluded words
+    # 1) Load excluded words
     excluded_words = load_excluded_words(company_name)
     print("Excluded words:", excluded_words)
 
@@ -37,37 +37,54 @@ def debug_exclusion(company_name=None):
     else:
         print("'a' is NOT in excluded_words...")
 
-    # 2️⃣ Regex tokenize (in lowercase), then normalize each token
+    # 2) Regex tokenize (in lowercase)
     raw_tokens = re.findall(r"\b\w+\b", job_text.lower())
-    words = [normalize_token(token) for token in raw_tokens]
 
+    # 2a) Print the first 30 raw tokens with repr()
     print("\n--- First 30 raw tokens (repr) ---")
     for i, t in enumerate(raw_tokens[:30]):
         print(i, repr(t))
 
+    # 3) Normalize each token
+    normalized_tokens = [normalize_token(token) for token in raw_tokens]
+
+    # 3a) Print the first 30 normalized tokens with repr()
     print("\n--- First 30 normalized tokens (repr) ---")
-    for i, t in enumerate(words[:30]):
+    for i, t in enumerate(normalized_tokens[:30]):
         print(i, repr(t))
 
-    # 3️⃣ Show lemmatization of each token
-    lemmatized_tokens = [lemmatize_word(w) for w in words]
+    # 4) Lemmatize each normalized token
+    lemmatized_tokens = [lemmatize_word(w) for w in normalized_tokens]
     print("\n--- First 30 lemmatized tokens ---")
     print(lemmatized_tokens[:30])
 
-    # 4️⃣ Filter out excluded words after normalization
-    filtered_tokens = [lemmatize_word(w) for w in words if w not in excluded_words]
+    # 5) Filter out excluded words AFTER normalization
+    filtered_tokens = [lemmatize_word(w) for w in normalized_tokens if w not in excluded_words]
+
+    # 5a) Print the first 30 filtered tokens
     print("\n--- First 30 filtered tokens ---")
     print(filtered_tokens[:30])
 
-    # 5️⃣ Optionally show the top 10 keywords
-    top_keywords = extract_keywords(job_text, top_n=10, company_name=company_name)
+    # 5b) Check if 'a' is still in filtered tokens
+    if "a" in filtered_tokens:
+        print("\n*** 'a' is STILL in filtered_tokens ***")
+    else:
+        print("\n'a' is not in filtered_tokens, which is correct!")
+
+    # 6) Show top 10 job keywords
     print("\n--- Top 10 Job Keywords ---")
+    top_keywords = extract_keywords(job_text, top_n=10, company_name=company_name)
     for kw, count, score in top_keywords:
         print(f"{kw}: {count} occurrences, importance {score}/10")
 
-        for i, token in enumerate(normalized_words):
-            if token == "a":
-                print(i, repr(token), "excluded?", token in excluded_words)
+    print("\n--- Checking each normalized token for 'a' ---")
+    for i, tok in enumerate(normalized_tokens):
+        if tok == "a":
+            print(f"Token index {i} is 'a', excluded? {tok in excluded_words}")
+
+    for i, token in enumerate(normalized_tokens):
+        print(i, repr(token))
+
 
 if __name__ == "__main__":
-    debug_exclusion(company_name=None)  # or "FBI" or "A" or whatever to test
+    debug_exclusion(company_name=None)  # or "FBI", "A", etc. to test

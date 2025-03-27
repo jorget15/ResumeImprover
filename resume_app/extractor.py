@@ -37,34 +37,33 @@ def extract_text_from_paste(pasted_text):
         return "No job description provided."
 
 def extract_keywords(text, top_n=5, company_name=None):
-    """
-    Finds frequent words while ignoring excluded words. Returns a list of (word, count, importance).
-    If top_n is None, returns all words with freq>1.
-    """
+    """Finds frequent words while removing excluded words + normalization."""
     excluded_words = load_excluded_words(company_name)
-    # Tokenize
+    # 1) Tokenize raw text in lowercase
     raw_tokens = re.findall(r"\b\w+\b", text.lower())
-    # Normalize & Filter
-    normalized_tokens = [normalize_token(tok) for tok in raw_tokens]
-    filtered = [lemmatize_word(tok) for tok in normalized_tokens if tok not in excluded_words]
+    # 2) Normalize each token
+    def normalize_token(tok):
+        # Turn to NFKC
+        tok = unicodedata.normalize("NFKC", tok)
+        tok = tok.strip()
+        return tok
 
-    word_counts = Counter(filtered)
-    importance_scores = calculate_importance(word_counts)
+    normalized_tokens = [normalize_token(t) for t in raw_tokens]
+    # 3) Filter out excluded words, lemmatize
+    filtered_tokens = []
+    for tok in normalized_tokens:
+        if tok not in excluded_words:
+            filtered_tokens.append(lemmatize_word(tok))
 
+    # 4) Count frequencies + importance
+    word_counts = Counter(filtered_tokens)
+    importance = calculate_importance(word_counts)
+
+    # 5) Return top_n or all
     if top_n is not None:
-        # Return top_n words (count>1) with importance
-        return [
-            (w, c, importance_scores[w])
-            for w, c in word_counts.most_common(top_n)
-            if c > 1
-        ]
+        return [(w, c, importance[w]) for w, c in word_counts.most_common(top_n) if c > 1]
     else:
-        # Return ALL words with freq>1
-        return [
-            (w, c, importance_scores[w])
-            for w, c in word_counts.most_common()
-            if c > 1
-        ]
+        return [(w, c, importance[w]) for w, c in word_counts.most_common() if c > 1]
 
 def extract_bigrams(text, top_n=5, company_name=None):
     """
