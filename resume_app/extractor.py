@@ -49,33 +49,35 @@ def extract_text_from_paste(pasted_text):
 
 
 def extract_keywords(text, top_n=5, company_name=None):
-    """
-    Finds the most frequent words (ignoring single occurrences),
-    assigns importance scores, and returns occurrence count.
-    """
-    # 1) Load excluded words
-    excluded_words = load_excluded_words(company_name)
+    """Finds the most frequent words (ignoring single occurrences), assigns importance scores."""
 
-    # 2) Tokenize text, ensuring lowercase
+    excluded_words = load_excluded_words(company_name)
     words = re.findall(r"\b\w+\b", text.lower())
 
-    # 3) Normalize each token (strip hidden Unicode, whitespace, etc.)
+    # Normalize each raw token
     normalized_words = [normalize_token(w) for w in words]
 
-    # 4) Filter out excluded words, then lemmatize
-    filtered_words = [lemmatize_word(w) for w in normalized_words if w not in excluded_words]
+    # Filter out excluded words, then lemmatize
+    filtered_words = []
+    for token in normalized_words:
+        if token not in excluded_words:
+            filtered_words.append(lemmatize_word(token))
 
-    # 5) Build frequency counts & calculate importance
     word_counts = Counter(filtered_words)
     importance_scores = calculate_importance(word_counts)
 
-    # 6) Return the top N (if top_n is None, you can return all)
-    #    If you only want tokens with freq > 1, keep your "if count > 1" check
     if top_n is not None:
-        return [(word, count, importance_scores[word]) for word, count in word_counts.most_common(top_n) if count > 1]
+        return [
+            (word, count, importance_scores[word])
+            for word, count in word_counts.most_common(top_n)
+            if count > 1
+        ]
     else:
-        return [(word, count, importance_scores[word]) for word, count in word_counts.most_common() if count > 1]
-
+        return [
+            (word, count, importance_scores[word])
+            for word, count in word_counts.most_common()
+            if count > 1
+        ]
 
 def extract_bigrams(text, company_name=None, top_n=5):
     """Finds the most frequent bigrams while removing excluded words."""
@@ -95,11 +97,10 @@ def extract_bigrams(text, company_name=None, top_n=5):
 
 def normalize_token(token: str) -> str:
     """
-    Convert token to a normalized form and strip whitespace
-    or invisible characters, ensuring tokens match excluded words exactly.
+    Convert to a normalized form and strip any hidden whitespace/unicode.
     """
-    # 1) Normalize to handle weird Unicode variations (NFKC handles e.g. half-width characters)
-    token = unicodedata.normalize('NFKC', token)
-    # 2) Strip trailing spaces, zero-width spaces, etc.
+    # Normalize to NFKC to unify visually identical but distinct codepoints
+    token = unicodedata.normalize("NFKC", token)
+    # Strip all whitespace (including zero-width spaces)
     token = token.strip()
     return token
