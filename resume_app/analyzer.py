@@ -7,45 +7,51 @@ import unicodedata
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 
-# 1) Ensure there's a directory for NLTK data
+# 1) Where to store NLTK data
 nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
 os.makedirs(nltk_data_path, exist_ok=True)
 
-# 2) Append it to the NLTK search path so NLTK can find what we download
+# 2) Make sure that path is in NLTK's data search paths
 if nltk_data_path not in nltk.data.path:
     nltk.data.path.append(nltk_data_path)
 
-# 3) Define the resources you really need.
-#    - "averaged_perceptron_tagger_eng" is the modern English POS tagger.
-#    - "punkt" is needed if you use nltk.word_tokenize.
-#    - "wordnet" and "omw-1.4" are used for lemmatization.
+# 3) If your code uses these corpora/models:
 nltk_resources = [
-    "wordnet",
-    "omw-1.4",
-    "punkt",
-    "averaged_perceptron_tagger_eng",
+    "wordnet",  # for lemmatization
+    "omw-1.4",  # for WordNet synonyms
+    "punkt",  # for nltk.word_tokenize
+    "averaged_perceptron_tagger_eng",  # modern English POS tagger
 ]
 
+# Map each resource to the correct subfolder
+#   - wordnet => corpora/wordnet
+#   - omw-1.4 => corpora/omw-1.4
+#   - punkt => tokenizers/punkt
+#   - averaged_perceptron_tagger_eng => taggers/averaged_perceptron_tagger_eng
+subfolder_map = {
+    "wordnet": "corpora/wordnet",
+    "omw-1.4": "corpora/omw-1.4",
+    "punkt": "tokenizers/punkt",
+    "averaged_perceptron_tagger_eng": "taggers/averaged_perceptron_tagger_eng",
+}
+
+
 def ensure_nltk_resources():
-    """Ensure all required NLTK models are installed."""
+    """Ensure all required NLTK resources are installed before using them."""
     for resource in nltk_resources:
+        subfolder = subfolder_map[resource]
         try:
-            # We'll do a more precise check by including the subfolder name:
-            #  - corpora/wordnet
-            #  - corpora/omw-1.4
-            #  - tokenizers/punkt
-            #  - taggers/averaged_perceptron_tagger_eng
-            # but just using 'resource' alone works if you consistently
-            # download with the short name. If it's missing, we catch LookupError.
-            nltk.data.find(resource)
+            # 4) Check for the exact subfolder path:
+            nltk.data.find(subfolder)
         except LookupError:
+            print(f"Downloading missing NLTK resource: {resource}")
             nltk.download(resource, download_dir=nltk_data_path)
 
-# 4) Call this exactly once at import time (or top of your Streamlit app)
+
+# 5) Call at module load (or top of Streamlit script) so it's done
 ensure_nltk_resources()
 
 print("✅ NLTK data path:", nltk.data.path)
-
 
 
 def load_excluded_words(company_name=None):
