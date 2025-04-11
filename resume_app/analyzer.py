@@ -39,10 +39,20 @@ ensure_nltk_resources()
 print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
 
 
+def expand_company_terms(company_name: str):
+    """Break company name into parts, abbreviation, and full string."""
+    parts = company_name.lower().split()
+    abbrev = ''.join([w[0] for w in parts if w])
+    terms = set(parts)
+    terms.add(abbrev)
+    terms.add(company_name.lower())
+    return terms
+
+
 def load_excluded_words(company_name=None):
     """
-    Loads excluded words from excluded_words.json. Optionally excludes the company name.
-    JSON can have categories or plain lists, but we flatten them into one set.
+    Loads excluded words from excluded_words.json. Optionally excludes
+    company name and its variants (abbreviation + individual words).
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     excluded_path = os.path.join(script_dir, "excluded_words.json")
@@ -62,9 +72,9 @@ def load_excluded_words(company_name=None):
                         else:
                             excluded_words.add(word.lower().strip())
 
-    # Exclude company name if provided
+    # Exclude company name variants if provided
     if company_name and company_name.strip():
-        excluded_words.add(company_name.lower().strip())
+        excluded_words |= expand_company_terms(company_name.strip())
 
     return excluded_words
 

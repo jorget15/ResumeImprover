@@ -1,6 +1,15 @@
 import re
 from extractor import extract_keywords, extract_bigrams
 
+def expand_company_terms(company_name: str):
+    if not company_name:
+        return set()
+    parts = company_name.lower().split()
+    words = set(parts)
+    abbrev = ''.join([w[0] for w in parts if w])  # e.g. "fiu"
+    words.add(abbrev)
+    words.add(company_name.lower())
+    return words
 
 def analyze_resume_against_job(resume_text, job_text, company_name=None):
     """
