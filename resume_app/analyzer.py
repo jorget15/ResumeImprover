@@ -20,7 +20,7 @@ nltk_resources = [
     "averaged_perceptron_tagger",
     "wordnet",
     "omw-1.4"
-    # "taggers/averaged_perceptron_tagger_eng"  # Usually "averaged_perceptron_tagger" alone suffices
+    "taggers/averaged_perceptron_tagger_eng"  # Usually "averaged_perceptron_tagger" alone suffices
 ]
 
 
@@ -30,7 +30,7 @@ def ensure_nltk_resources():
         try:
             nltk.data.find(resource)
         except LookupError:
-            nltk.download(resource.split('/')[-1], download_dir=nltk_data_path)
+            nltk.download(resource, download_dir=nltk_data_path)
 
 # Initialize NLTK resources at import
 ensure_nltk_resources()
