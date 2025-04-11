@@ -26,19 +26,6 @@ nltk_resources = [
     "averaged_perceptron_tagger",  # modern English POS tagger
 ]
 
-# Map each resource to the correct subfolder
-#   - wordnet => corpora/wordnet
-#   - omw-1.4 => corpora/omw-1.4
-#   - punkt => tokenizers/punkt
-#   - averaged_perceptron_tagger_eng => taggers/averaged_perceptron_tagger_eng
-subfolder_map = {
-    "wordnet": "corpora/wordnet",
-    "omw-1.4": "corpora/omw-1.4",
-    "punkt": "tokenizers/punkt",
-    "averaged_perceptron_tagger": "taggers/averaged_perceptron_tagger",
-}
-
-
 def ensure_nltk_resources():
     """Ensure all required NLTK resources are installed before using them."""
     for resource in nltk_resources:
