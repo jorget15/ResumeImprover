@@ -27,14 +27,18 @@ nltk_resources = [
 ]
 
 def ensure_nltk_resources():
-    """Ensure all required NLTK resources are installed before using them."""
+    """Ensure all required NLTK models are installed."""
     for resource in nltk_resources:
-        subfolder = subfolder_map[resource]
         try:
-            # 4) Check for the exact subfolder path:
-            nltk.data.find(subfolder)
+            # We'll do a more precise check by including the subfolder name:
+            #  - corpora/wordnet
+            #  - corpora/omw-1.4
+            #  - tokenizers/punkt
+            #  - taggers/averaged_perceptron_tagger_eng
+            # but just using 'resource' alone works if you consistently
+            # download with the short name. If it's missing, we catch LookupError.
+            nltk.data.find(resource)
         except LookupError:
-            print(f"Downloading missing NLTK resource: {resource}")
             nltk.download(resource, download_dir=nltk_data_path)
 
 
