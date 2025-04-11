@@ -4,8 +4,39 @@ import re
 import nltk
 import nltk.data
 import unicodedata
+
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
+
+# Force NLTK to use the correct path on both local and Streamlit Cloud
+nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
+if not os.path.exists(nltk_data_path):
+    os.makedirs(nltk_data_path)
+
+nltk.data.path.append(nltk_data_path)  # Ensure correct path
+
+# List of required NLTK resources
+nltk_resources = [
+    "averaged_perceptron_tagger_eng",
+    "wordnet",
+    "omw-1.4"
+    # "taggers/averaged_perceptron_tagger_eng"  # Usually "averaged_perceptron_tagger" alone suffices
+]
+
+
+def ensure_nltk_resources():
+    """Ensure all required NLTK models are installed."""
+    for resource in nltk_resources:
+        try:
+            nltk.data.find(resource)
+        except LookupError:
+            nltk.download(resource.split('/')[-1], download_dir=nltk_data_path)
+
+
+# Initialize NLTK resources at import
+ensure_nltk_resources()
+
+print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
 
 
 def load_excluded_words(company_name=None):
