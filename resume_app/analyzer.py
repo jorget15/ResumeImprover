@@ -8,46 +8,6 @@ from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 
 
-nltk.download('averaged_perceptron_tagger_eng')
-
-# 1) Where to store NLTK data
-nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
-os.makedirs(nltk_data_path, exist_ok=True)
-
-# 2) Make sure that path is in NLTK's data search paths
-if nltk_data_path not in nltk.data.path:
-    nltk.data.path.append(nltk_data_path)
-
-# 3) If your code uses these corpora/models:
-nltk_resources = [
-    "wordnet",  # for lemmatization
-    "omw-1.4",  # for WordNet synonyms
-    "punkt",  # for nltk.word_tokenize
-    "averaged_perceptron_tagger",  # modern English POS tagger
-]
-
-def ensure_nltk_resources():
-    """Ensure all required NLTK models are installed."""
-    for resource in nltk_resources:
-        try:
-            # We'll do a more precise check by including the subfolder name:
-            #  - corpora/wordnet
-            #  - corpora/omw-1.4
-            #  - tokenizers/punkt
-            #  - taggers/averaged_perceptron_tagger_eng
-            # but just using 'resource' alone works if you consistently
-            # download with the short name. If it's missing, we catch LookupError.
-            nltk.data.find(resource)
-        except LookupError:
-            nltk.download(resource, download_dir=nltk_data_path)
-
-
-# 5) Call at module load (or top of Streamlit script) so it's done
-ensure_nltk_resources()
-
-print("✅ NLTK data path:", nltk.data.path)
-
-
 def load_excluded_words(company_name=None):
     """
     Loads excluded words from excluded_words.json. Optionally excludes the company name.
