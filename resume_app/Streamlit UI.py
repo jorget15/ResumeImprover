@@ -17,7 +17,8 @@ job_text = st.text_area("📋 Paste Job Posting Text", height=200)
 # --- Analyze Button ---
 if st.button("Analyze Resume"):
     if not company_name.strip():
-        st.warning("⚠ Please enter the company name before analyzing. This helps exclude the company name from results.")
+        st.warning(
+            "⚠ Please enter the company name before analyzing. This helps exclude the company name from results.")
     elif not resume_text or not job_text.strip():
         st.warning("⚠ Please upload a resume and paste the job posting text.")
     else:

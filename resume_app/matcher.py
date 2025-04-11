@@ -1,6 +1,7 @@
 import re
 from extractor import extract_keywords, extract_bigrams
 
+
 def analyze_resume_against_job(resume_text, job_text, company_name=None):
     """
     Finds top job posting keywords/bigrams, compares them to ALL resume keywords/bigrams.

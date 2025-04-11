@@ -32,10 +32,12 @@ def ensure_nltk_resources():
         except LookupError:
             nltk.download(resource.split('/')[-1], download_dir=nltk_data_path)
 
+
 # Initialize NLTK resources at import
 ensure_nltk_resources()
 
 print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
+
 
 def load_excluded_words(company_name=None):
     """
@@ -66,13 +68,16 @@ def load_excluded_words(company_name=None):
 
     return excluded_words
 
+
 lemmatizer = WordNetLemmatizer()
+
 
 def get_wordnet_pos(word):
     """Map POS tag to first character WordNetLemmatizer understands."""
     tag = pos_tag([word])[0][1][0].upper()
     tag_dict = {"J": wordnet.ADJ, "N": wordnet.NOUN, "V": wordnet.VERB, "R": wordnet.ADV}
     return tag_dict.get(tag, wordnet.NOUN)  # Default to NOUN
+
 
 def lemmatize_word(word):
     """
@@ -87,6 +92,7 @@ def lemmatize_word(word):
         "analyzing": "analyze",
     }
     return special_cases.get(lemma, lemma)
+
 
 def calculate_importance(counts):
     """
@@ -108,6 +114,7 @@ def calculate_importance(counts):
     }
     return importance_scores
 
+
 def emphasize_target_words(text):
     """
     Example function that identifies words after phrases like 'we are looking for'.
@@ -124,6 +131,7 @@ def emphasize_target_words(text):
             if match:
                 results.append(lemmatize_word(match.group(1)))
     return results
+
 
 def normalize_token(token: str) -> str:
     """
