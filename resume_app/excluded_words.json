@@ -1,12 +1,41 @@
 {
-  "pronouns": ["you", "your", "we", "our"],
-  "auxiliary_verbs": ["is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did", "can", "could", "should", "would", "will", "shall", "may", "might", "must"],
-  "conjunctions": ["and", "or", "but", "so", "because"],
-  "articles": ["the", "a", "an", "that"],
-  "prepositions": ["of", "in", "on", "at", "by", "with", "for", "from", "to"],
-  "generic_words": ["hour", "per","temporary","cover letter", "cv","related", "document","recommend","applicant" ,"any", "other","employee", "international","job", "apply", "submit", "salary", "require", "become", "prefer", "experience", "work"],
-  "places": ["usa", "u.s.", "florida", "miami", "north", "south", "east", "west"],
-  "contractions": ["you'll"],
-  "random letters": ["b", "c", "d", "e","i", "o","u","s"],
-  "Months years": ["january", "jan", "february", "feb", "march", "mar","april", "apr","may", "may", "june", "jun","july", "jul","august", "aug","september", "sep", "october", "oct", "november", "nov", "december", "dec", "2025", "2026"]
+  "pronouns": [
+    "you", "your", "we", "our", "i", "me", "my", "mine", "it", "its", "they", "them", "their", "theirs", "he", "she", "his", "her", "hers"
+  ],
+  "auxiliary_verbs": [
+    "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did",
+    "can", "could", "should", "would", "will", "shall", "may", "might", "must"
+  ],
+  "conjunctions": [
+    "and", "or", "but", "so", "because", "if", "than", "while", "though", "although", "nor", "as"
+  ],
+  "articles": [
+    "the", "a", "an", "that", "this", "these", "those"
+  ],
+  "prepositions": [
+    "of", "in", "on", "at", "by", "with", "for", "from", "to", "over", "under", "between", "into", "onto", "through", "across", "during", "within", "about"
+  ],
+  "generic_words": [
+    "hour", "per", "temporary", "cover letter", "cv", "related", "document", "recommend", "applicant", "candidate",
+    "any", "other", "employee", "employer", "organization", "international", "job", "apply", "submit", "application",
+    "salary", "require", "required", "requirements", "become", "prefer", "preferred", "experience", "years", "work",
+    "position", "role", "team", "company", "department", "responsibilities", "duties", "qualifications", "opportunity",
+    "environment", "today", "currently", "please", "click", "email", "phone", "resume", "assist", "support", "provide",
+    "perform", "ensure", "looking", "seeking", "join", "include", "including", "help"
+  ],
+  "places": [
+    "usa", "u.s.", "united states", "america", "florida", "miami", "north", "south", "east", "west", "remote", "new york",
+    "california", "texas", "atlanta", "chicago", "washington", "los angeles"
+  ],
+  "contractions": [
+    "you'll", "you're", "we're", "don't", "can't", "didn't", "won't", "it's", "they're", "i'm", "wasn't", "shouldn't"
+  ],
+  "random letters": [
+    "b", "d", "e", "i", "o", "u", "s"
+  ],
+  "Months years": [
+    "january", "jan", "february", "feb", "march", "mar", "april", "apr", "may", "june", "jun", "july", "jul",
+    "august", "aug", "september", "sep", "october", "oct", "november", "nov", "december", "dec",
+    "2022", "2023", "2024", "2025", "2026", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+  ]
 }
