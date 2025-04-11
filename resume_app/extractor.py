@@ -2,7 +2,6 @@ import re
 import pdfplumber
 import docx2txt
 import nltk
-import unicodedata
 from collections import Counter
 
 from analyzer import (
@@ -11,6 +10,7 @@ from analyzer import (
     calculate_importance,
     normalize_token,  # We can import the normalizer from analyzer
 )
+
 
 def extract_resume_text(uploaded_file):
     """Extracts text from a PDF or DOCX resume uploaded via Streamlit."""
@@ -26,6 +26,7 @@ def extract_resume_text(uploaded_file):
 
     return ""
 
+
 def extract_text_from_paste(pasted_text):
     """
     Returns the pasted text or a default message if empty.
@@ -36,24 +37,16 @@ def extract_text_from_paste(pasted_text):
     else:
         return "No job description provided."
 
+
 def extract_keywords(text, top_n=5, company_name=None):
     """Finds frequent words while removing excluded words + normalization."""
     excluded_words = load_excluded_words(company_name)
     # 1) Tokenize raw text in lowercase
     raw_tokens = re.findall(r"\b\w+\b", text.lower())
     # 2) Normalize each token
-    def normalize_token(tok):
-        # Turn to NFKC
-        tok = unicodedata.normalize("NFKC", tok)
-        tok = tok.strip()
-        return tok
-
     normalized_tokens = [normalize_token(t) for t in raw_tokens]
     # 3) Filter out excluded words, lemmatize
-    filtered_tokens = []
-    for tok in normalized_tokens:
-        if tok not in excluded_words:
-            filtered_tokens.append(lemmatize_word(tok))
+    filtered_tokens = [lemmatize_word(tok) for tok in normalized_tokens if tok not in excluded_words]
 
     # 4) Count frequencies + importance
     word_counts = Counter(filtered_tokens)
@@ -64,6 +57,7 @@ def extract_keywords(text, top_n=5, company_name=None):
         return [(w, c, importance[w]) for w, c in word_counts.most_common(top_n) if c > 1]
     else:
         return [(w, c, importance[w]) for w, c in word_counts.most_common() if c > 1]
+
 
 def extract_bigrams(text, top_n=5, company_name=None):
     """
