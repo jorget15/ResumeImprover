@@ -4,7 +4,7 @@
   "conjunctions": ["and", "or", "but", "so", "because"],
   "articles": ["the", "a", "an"],
   "prepositions": ["of", "in", "on", "at", "by", "with", "for", "from", "to"],
-  "generic_words": ["job", "apply", "submit", "salary", "require", "become", "prefer", "experience", "work"],
+  "generic_words": ["any", "other","employee", "international","job", "apply", "submit", "salary", "require", "become", "prefer", "experience", "work"],
   "places": ["usa", "u.s.", "florida", "miami", "north", "south", "east", "west"],
   "contractions": ["you'll"],
   "random letters": ["b", "c", "d", "e","i", "o","u","s"],
