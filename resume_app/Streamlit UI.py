@@ -1,28 +1,38 @@
-import streamlit as st
-from matcher import analyze_resume_against_job
-from extractor import extract_resume_text
 import os
 import nltk
 
-# 1) Provide a directory to store NLTK data
-nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
-os.makedirs(nltk_data_path, exist_ok=True)
+# Set a universal and writable NLTK data path
+NLTK_DIR = "/tmp/nltk_data"
+os.makedirs(NLTK_DIR, exist_ok=True)
 
-# 2) Add the directory to NLTK's search path
-if nltk_data_path not in nltk.data.path:
-    nltk.data.path.append(nltk_data_path)
+# Add it to nltk's search path FIRST
+if NLTK_DIR not in nltk.data.path:
+    nltk.data.path.insert(0, NLTK_DIR)
 
-# 3) Download the tagger + any other resources you need, e.g. "punkt", "wordnet", "omw-1.4"
-nltk.download("averaged_perceptron_tagger_eng", download_dir=nltk_data_path)
-nltk.download("punkt", download_dir=nltk_data_path)
-nltk.download("wordnet", download_dir=nltk_data_path)
-nltk.download("omw-1.4", download_dir=nltk_data_path)
+# Ensure needed resources are downloaded
+resources = [
+    "punkt",
+    "wordnet",
+    "omw-1.4",
+    "averaged_perceptron_tagger_eng"
+]
 
-try:
-    nltk.data.find("taggers/averaged_perceptron_tagger_eng")
-    print("✅ averaged_perceptron_tagger_eng is installed!")
-except LookupError:
-    print("❌ Not found—download step didn’t work.")
+for res in resources:
+    try:
+        # Explicit path check — this is what nltk internally uses
+        if res == "averaged_perceptron_tagger_eng":
+            nltk.data.find("taggers/averaged_perceptron_tagger_eng")
+        elif res == "punkt":
+            nltk.data.find("tokenizers/punkt")
+        else:
+            nltk.data.find(f"corpora/{res}")
+    except LookupError:
+        nltk.download(res, download_dir=NLTK_DIR, quiet=True)
+
+# ✅ Now it's safe to import your own code
+from matcher import analyze_resume_against_job
+from extractor import extract_resume_text
+import streamlit as st
 
 
 # --- Your existing Streamlit code below ---
