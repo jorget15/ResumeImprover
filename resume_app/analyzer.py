@@ -7,6 +7,9 @@ import unicodedata
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 
+
+nltk.download('averaged_perceptron_tagger_eng')
+
 # 1) Where to store NLTK data
 nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
 os.makedirs(nltk_data_path, exist_ok=True)
