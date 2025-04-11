@@ -1,20 +1,6 @@
 import streamlit as st
 from matcher import analyze_resume_against_job
 from extractor import extract_resume_text
-import nltk
-
-resources = {
-    "tokenizers/punkt": "punkt",
-    "taggers/averaged_perceptron_tagger_eng": "averaged_perceptron_tagger_eng",
-    "corpora/wordnet": "wordnet",
-    "corpora/omw-1.4": "omw-1.4",
-}
-
-for path, name in resources.items():
-    try:
-        nltk.data.find(path)
-    except LookupError:
-        nltk.download(name, quiet=True)
 
 st.title("📄 Resume vs Job Posting Analyzer")
 
