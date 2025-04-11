@@ -2,6 +2,7 @@ import re
 import pdfplumber
 import docx2txt
 import nltk
+import unicodedata
 from collections import Counter
 
 from analyzer import (
@@ -10,7 +11,6 @@ from analyzer import (
     calculate_importance,
     normalize_token,  # We can import the normalizer from analyzer
 )
-
 
 def extract_resume_text(uploaded_file):
     """Extracts text from a PDF or DOCX resume uploaded via Streamlit."""
@@ -26,7 +26,6 @@ def extract_resume_text(uploaded_file):
 
     return ""
 
-
 def extract_text_from_paste(pasted_text):
     """
     Returns the pasted text or a default message if empty.
@@ -37,27 +36,35 @@ def extract_text_from_paste(pasted_text):
     else:
         return "No job description provided."
 
-
 def extract_keywords(text, top_n=5, company_name=None):
-    """Finds frequent words while removing excluded words + normalization."""
+    """
+    Finds frequent words while ignoring excluded words. Returns a list of (word, count, importance).
+    If top_n is None, returns all words with freq>1.
+    """
     excluded_words = load_excluded_words(company_name)
-    # 1) Tokenize raw text in lowercase
+    # Tokenize
     raw_tokens = re.findall(r"\b\w+\b", text.lower())
-    # 2) Normalize each token
-    normalized_tokens = [normalize_token(t) for t in raw_tokens]
-    # 3) Filter out excluded words, lemmatize
-    filtered_tokens = [lemmatize_word(tok) for tok in normalized_tokens if tok not in excluded_words]
+    # Normalize & Filter
+    normalized_tokens = [normalize_token(tok) for tok in raw_tokens]
+    filtered = [lemmatize_word(tok) for tok in normalized_tokens if tok not in excluded_words]
 
-    # 4) Count frequencies + importance
-    word_counts = Counter(filtered_tokens)
-    importance = calculate_importance(word_counts)
+    word_counts = Counter(filtered)
+    importance_scores = calculate_importance(word_counts)
 
-    # 5) Return top_n or all
     if top_n is not None:
-        return [(w, c, importance[w]) for w, c in word_counts.most_common(top_n) if c > 1]
+        # Return top_n words (count>1) with importance
+        return [
+            (w, c, importance_scores[w])
+            for w, c in word_counts.most_common(top_n)
+            if c > 1
+        ]
     else:
-        return [(w, c, importance[w]) for w, c in word_counts.most_common() if c > 1]
-
+        # Return ALL words with freq>1
+        return [
+            (w, c, importance_scores[w])
+            for w, c in word_counts.most_common()
+            if c > 1
+        ]
 
 def extract_bigrams(text, top_n=5, company_name=None):
     """
