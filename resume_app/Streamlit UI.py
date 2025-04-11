@@ -1,43 +1,6 @@
-import os
-import nltk
-
-# Set a universal and writable NLTK data path
-NLTK_DIR = "/tmp/nltk_data"
-os.makedirs(NLTK_DIR, exist_ok=True)
-
-# Add it to nltk's search path FIRST
-if NLTK_DIR not in nltk.data.path:
-    nltk.data.path.insert(0, NLTK_DIR)
-
-# Ensure needed resources are downloaded
-resources = [
-    "punkt",
-    "wordnet",
-    "omw-1.4",
-    "averaged_perceptron_tagger_eng"
-]
-
-for res in resources:
-    try:
-        # Explicit path check — this is what nltk internally uses
-        if res == "averaged_perceptron_tagger_eng":
-            nltk.data.find("taggers/averaged_perceptron_tagger_eng")
-        elif res == "punkt":
-            nltk.data.find("tokenizers/punkt")
-        else:
-            nltk.data.find(f"corpora/{res}")
-    except LookupError:
-        nltk.download(res, download_dir=NLTK_DIR, quiet=True)
-
-# ✅ Now it's safe to import your own code
+import streamlit as st
 from matcher import analyze_resume_against_job
 from extractor import extract_resume_text
-import streamlit as st
-
-
-# --- Your existing Streamlit code below ---
-st.title("📄 Resume vs Job Posting Analyzer")
-...
 
 st.title("📄 Resume vs Job Posting Analyzer")
 
@@ -54,8 +17,7 @@ job_text = st.text_area("📋 Paste Job Posting Text", height=200)
 # --- Analyze Button ---
 if st.button("Analyze Resume"):
     if not company_name.strip():
-        st.warning(
-            "⚠ Please enter the company name before analyzing. This helps exclude the company name from results.")
+        st.warning("⚠ Please enter the company name before analyzing. This helps exclude the company name from results.")
     elif not resume_text or not job_text.strip():
         st.warning("⚠ Please upload a resume and paste the job posting text.")
     else:
