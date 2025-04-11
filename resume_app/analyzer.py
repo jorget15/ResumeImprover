@@ -7,41 +7,45 @@ import unicodedata
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 
-
+# 1) Ensure there's a directory for NLTK data
 nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
-if not os.path.exists(nltk_data_path):
-    os.makedirs(nltk_data_path)
+os.makedirs(nltk_data_path, exist_ok=True)
 
-# Updated list of resources to include
-# - wordnet (for lemmatizer)
-# - omw-1.4 (for WordNet synonyms)
-# - punkt (for tokenization, if you use nltk.word_tokenize)
-# - averaged_perceptron_tagger_eng (the modern English POS tagger model)
+# 2) Append it to the NLTK search path so NLTK can find what we download
+if nltk_data_path not in nltk.data.path:
+    nltk.data.path.append(nltk_data_path)
+
+# 3) Define the resources you really need.
+#    - "averaged_perceptron_tagger_eng" is the modern English POS tagger.
+#    - "punkt" is needed if you use nltk.word_tokenize.
+#    - "wordnet" and "omw-1.4" are used for lemmatization.
 nltk_resources = [
     "wordnet",
     "omw-1.4",
     "punkt",
-    "averaged_perceptron_tagger_eng"
+    "averaged_perceptron_tagger_eng",
 ]
 
 def ensure_nltk_resources():
     """Ensure all required NLTK models are installed."""
     for resource in nltk_resources:
         try:
-            # Each resource is stored in a slightly different subfolder:
-            # - corpora/wordnet, corpora/omw-1.4
-            # - tokenizers/punkt
-            # - taggers/averaged_perceptron_tagger_eng
-            # But calling nltk.download(...) with the short name
-            # automatically puts it in the correct subfolder.
-            nltk.data.find(resource)  # Will raise LookupError if not installed
+            # We'll do a more precise check by including the subfolder name:
+            #  - corpora/wordnet
+            #  - corpora/omw-1.4
+            #  - tokenizers/punkt
+            #  - taggers/averaged_perceptron_tagger_eng
+            # but just using 'resource' alone works if you consistently
+            # download with the short name. If it's missing, we catch LookupError.
+            nltk.data.find(resource)
         except LookupError:
             nltk.download(resource, download_dir=nltk_data_path)
 
-# Initialize NLTK resources at import
+# 4) Call this exactly once at import time (or top of your Streamlit app)
 ensure_nltk_resources()
 
-print("✅ NLTK is now using this path:", nltk.data.path)
+print("✅ NLTK data path:", nltk.data.path)
+
 
 
 def load_excluded_words(company_name=None):
@@ -73,13 +77,16 @@ def load_excluded_words(company_name=None):
 
     return excluded_words
 
+
 lemmatizer = WordNetLemmatizer()
+
 
 def get_wordnet_pos(word):
     """Map POS tag to first character WordNetLemmatizer understands."""
     tag = pos_tag([word])[0][1][0].upper()
     tag_dict = {"J": wordnet.ADJ, "N": wordnet.NOUN, "V": wordnet.VERB, "R": wordnet.ADV}
     return tag_dict.get(tag, wordnet.NOUN)  # Default to NOUN
+
 
 def lemmatize_word(word):
     """
@@ -94,6 +101,7 @@ def lemmatize_word(word):
         "analyzing": "analyze",
     }
     return special_cases.get(lemma, lemma)
+
 
 def calculate_importance(counts):
     """
@@ -115,6 +123,7 @@ def calculate_importance(counts):
     }
     return importance_scores
 
+
 def emphasize_target_words(text):
     """
     Example function that identifies words after phrases like 'we are looking for'.
@@ -131,6 +140,7 @@ def emphasize_target_words(text):
             if match:
                 results.append(lemmatize_word(match.group(1)))
     return results
+
 
 def normalize_token(token: str) -> str:
     """

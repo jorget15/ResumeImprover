@@ -15,6 +15,7 @@ multi-system solutions to meet the organization's needs. Recommendations in thes
 areas should be made with a high level of technical competency.
 """
 
+
 def normalize_token(token: str) -> str:
     """
     Convert token to a normalized form and strip hidden whitespace/unicode
@@ -24,6 +25,7 @@ def normalize_token(token: str) -> str:
     token = unicodedata.normalize("NFKC", token)
     # Strip trailing spaces, zero-width spaces, etc.
     return token.strip()
+
 
 def debug_exclusion(company_name=None):
     """Debug function to see how excluded words filter out 'a' or any other tokens."""
