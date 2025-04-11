@@ -12,6 +12,7 @@ from analyzer import (
     normalize_token,  # We can import the normalizer from analyzer
 )
 
+
 def extract_resume_text(uploaded_file):
     """Extracts text from a PDF or DOCX resume uploaded via Streamlit."""
     if not uploaded_file:
@@ -26,6 +27,7 @@ def extract_resume_text(uploaded_file):
 
     return ""
 
+
 def extract_text_from_paste(pasted_text):
     """
     Returns the pasted text or a default message if empty.
@@ -35,6 +37,7 @@ def extract_text_from_paste(pasted_text):
         return pasted_text.strip()
     else:
         return "No job description provided."
+
 
 def extract_keywords(text, top_n=5, company_name=None):
     """
@@ -65,6 +68,7 @@ def extract_keywords(text, top_n=5, company_name=None):
             for w, c in word_counts.most_common()
             if c > 1
         ]
+
 
 def extract_bigrams(text, top_n=5, company_name=None):
     """
