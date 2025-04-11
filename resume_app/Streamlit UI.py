@@ -18,6 +18,13 @@ nltk.download("punkt", download_dir=nltk_data_path)
 nltk.download("wordnet", download_dir=nltk_data_path)
 nltk.download("omw-1.4", download_dir=nltk_data_path)
 
+try:
+    nltk.data.find("taggers/averaged_perceptron_tagger_eng")
+    print("✅ averaged_perceptron_tagger_eng is installed!")
+except LookupError:
+    print("❌ Not found—download step didn’t work.")
+
+
 # --- Your existing Streamlit code below ---
 st.title("📄 Resume vs Job Posting Analyzer")
 ...
