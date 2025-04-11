@@ -4,38 +4,45 @@ import re
 import nltk
 import nltk.data
 import unicodedata
-
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import wordnet
 
-# Force NLTK to use the correct path on both local and Streamlit Cloud
+
 nltk_data_path = os.path.join(os.path.expanduser("~"), "nltk_data")
 if not os.path.exists(nltk_data_path):
     os.makedirs(nltk_data_path)
 
-nltk.data.path.append(nltk_data_path)  # Ensure correct path
-
-# List of required NLTK resources
+# Updated list of resources to include
+# - wordnet (for lemmatizer)
+# - omw-1.4 (for WordNet synonyms)
+# - punkt (for tokenization, if you use nltk.word_tokenize)
+# - averaged_perceptron_tagger_eng (the modern English POS tagger model)
 nltk_resources = [
-    "averaged_perceptron_tagger",
     "wordnet",
-    "omw-1.4"
-    "taggers/averaged_perceptron_tagger_eng"  # Usually "averaged_perceptron_tagger" alone suffices
+    "omw-1.4",
+    "punkt",
+    "averaged_perceptron_tagger_eng"
 ]
-
 
 def ensure_nltk_resources():
     """Ensure all required NLTK models are installed."""
     for resource in nltk_resources:
         try:
-            nltk.data.find(resource)
+            # Each resource is stored in a slightly different subfolder:
+            # - corpora/wordnet, corpora/omw-1.4
+            # - tokenizers/punkt
+            # - taggers/averaged_perceptron_tagger_eng
+            # But calling nltk.download(...) with the short name
+            # automatically puts it in the correct subfolder.
+            nltk.data.find(resource)  # Will raise LookupError if not installed
         except LookupError:
             nltk.download(resource, download_dir=nltk_data_path)
 
 # Initialize NLTK resources at import
 ensure_nltk_resources()
 
-print("✅ NLTK is now using this path:", nltk.data.path)  # Debug print
+print("✅ NLTK is now using this path:", nltk.data.path)
+
 
 def load_excluded_words(company_name=None):
     """
