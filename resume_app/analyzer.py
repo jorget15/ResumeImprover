@@ -75,6 +75,8 @@ def load_excluded_words(company_name=None):
     # Exclude company name variants if provided
     if company_name and company_name.strip():
         excluded_words |= expand_company_terms(company_name.strip())
+        print("❗ Final excluded words sample:", sorted(list(excluded_words))[:20])
+        print("✅ Is 'fiu' in exclusion list?:", 'fiu' in excluded_words)
 
     return excluded_words
 

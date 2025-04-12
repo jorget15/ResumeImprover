@@ -44,12 +44,18 @@ def extract_keywords(text, top_n=5, company_name=None):
     Finds frequent words while ignoring excluded words. Returns a list of (word, count, importance).
     If top_n is None, returns all words with freq>1.
     """
+    if company_name:
+        text = text.replace(company_name, "")  # Remove full company name
+        # Also remove abbreviation manually
+        abbreviation = ''.join([w[0] for w in company_name.lower().split()])
+        text = text.replace(abbreviation, "")  # e.g., remove "fiu"
+
     excluded_words = load_excluded_words(company_name)
     # Tokenize
     raw_tokens = re.findall(r"\b\w+\b", text.lower())
     # Normalize & Filter
     normalized_tokens = [normalize_token(tok) for tok in raw_tokens]
-    filtered = [lemmatize_word(tok) for tok in normalized_tokens if tok not in excluded_words]
+    filtered = [lemmatize_word(tok) for tok in normalized_tokens if tok.lower() not in excluded_words]
 
     word_counts = Counter(filtered)
     importance_scores = calculate_importance(word_counts)
