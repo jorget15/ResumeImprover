@@ -1,5 +1,0 @@
-Google: Google Analytics, Google Ads, Google Cloud
-Microsoft: Azure, Office 365, Microsoft Teams
-Amazon: AWS, Amazon Web Services, Alexa
-Meta: Facebook Ads, Instagram, WhatsApp
-Tesla: Autopilot, Battery Tech, EV Charging
