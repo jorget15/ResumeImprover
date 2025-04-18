@@ -4,25 +4,25 @@ from extractor import extract_resume_text
 
 st.title("📄 Resume vs Job Posting Analyzer")
 
-# --- Company Name ---
+# Company Name input
 company_name = st.text_input("🏢 Enter the Company Name (Required)")
 
-# --- Resume Upload ---
+# Resume Upload button
 uploaded_resume = st.file_uploader("📂 Upload Your Resume (PDF/DOCX)", type=["pdf", "docx"])
 resume_text = extract_resume_text(uploaded_resume) if uploaded_resume else ""
 
-# --- Job Posting Input ---
+# Job Posting Input
 job_text = st.text_area("📋 Paste Job Posting Text", height=200)
 
-# --- Analyze Button ---
+# Analyze Button
 if st.button("Analyze Resume"):
-    if not company_name.strip():
+    if not company_name.strip(): #Checks if there is a company name and tells the user to input one if there isn't
         st.warning(
             "⚠ Please enter the company name before analyzing. This helps exclude the company name from results.")
     elif not resume_text or not job_text.strip():
         st.warning("⚠ Please upload a resume and paste the job posting text.")
     else:
-        # 1) Run analysis
+        # 1) Run analysis (calls Matcher.py's analyze_resume_against_job)
         match_results = analyze_resume_against_job(resume_text, job_text, company_name)
 
         # 2) Display results
