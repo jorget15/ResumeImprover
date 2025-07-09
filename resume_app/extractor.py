@@ -1,6 +1,6 @@
 import re
 import pdfplumber
-import docx2txt
+from docx import Document
 import nltk
 import unicodedata
 from collections import Counter
@@ -23,7 +23,12 @@ def extract_resume_text(uploaded_file):
         with pdfplumber.open(uploaded_file) as pdf:
             return "\n".join(page.extract_text() or "" for page in pdf.pages) #return all lines as a single text
     elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        return docx2txt.process(uploaded_file)  #Return all lines as a single text
+        # Extract text from DOCX using python-docx
+        doc = Document(uploaded_file)
+        text = []
+        for paragraph in doc.paragraphs:
+            text.append(paragraph.text)
+        return "\n".join(text)  # Return all paragraphs as a single text
 
     return "" #if not DOCX or PDF return empty string
 
